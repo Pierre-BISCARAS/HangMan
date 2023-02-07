@@ -85,7 +85,7 @@ int main(int argc, char *argv[]){
     // Attente d'une conexion
 	
     memset(messageRecu, 0x00, LG_MESSAGE*sizeof(char));
-    printf("Attente d’une demande de connexion (quitter avec Ctrl-C)\n\n");
+    printf("\nAttente d’une demande de connexion (quitter avec Ctrl-C)\n\n");
 
     // c’est un appel bloquant
     socketDialogue = accept(socketEcoute, (struct sockaddr *)&pointDeRencontreDistant, &longueurAdresse);
@@ -96,14 +96,12 @@ int main(int argc, char *argv[]){
         exit(-4);
     }
 
-    printf("Un client vient de se connecter (quitter avec Ctrl-C)\n\n");
+    printf("Un client vient de se connecter\n\n");
 
     //---------------------------------------------------------------------
     // Boucle du jeu
 
 	while(1){
-
-        
 
         //--------------------------------
         // Envoie de le message au client
@@ -122,9 +120,8 @@ int main(int argc, char *argv[]){
 				  close(socketDialogue);
 				  return 0;
 			default:  /* envoi de n octets */
-   				  printf("Message %s envoyé\n\n", messageEnvoi);
+   				  printf("Message envoyé : %s\n\n", messageEnvoi);
 		}
-		
 
         //-------------------------------------------------
         // Reception et traitement de la réponse du client
