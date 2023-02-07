@@ -112,6 +112,7 @@ int main(int argc, char *argv[]){
 
     // Variables
     char *word; // Mot a deviné
+    char allLetters[26] = "abcdefghijklmnopqrstuvwxyz"; // Tableau qui contient toutes les lettres de l'alphabet (lettre jouable)
     char usedLetter[26] = {}; // Tableau qui contient les lettres que le joueur propose
     int numberOfUsedLetter = 0;
 
@@ -146,10 +147,15 @@ int main(int argc, char *argv[]){
             if (strchr(word, letter) == NULL) { // Si le mot de contient pas la lettre choisie
                 current_life ++;
             }
-
-            addLetterToUsedLetter(usedLetter, letter, &numberOfUsedLetter);
-
-            displayUsedLetter(usedLetter);
+            if (strchr(allLetters,letter)==NULL)
+            {
+                printf("Le caractère '%c' n'est pas utilisable\n", letter);
+            }
+            else
+            {
+                addLetterToUsedLetter(usedLetter, letter, &numberOfUsedLetter);
+            }
+            //displayUsedLetter(usedLetter);
             continue;
         }
         
