@@ -8,10 +8,10 @@ Permet de vérifier si une lettre a déjà été utlisée.
 1 : Vrai
 0 : Faux
 */
-int letterAlreadyUsed(char letter, char *usedLetter[26]){
+int letterAlreadyUsed(char letter, char usedLetter[26]){
     int i;
     for (i = 0; i < 26; i++) {
-        if (usedLetter[i] != NULL && *usedLetter[i] == letter) {
+        if (usedLetter[i] == letter) {
             return 1;
         }
     }
@@ -40,27 +40,27 @@ void displayLife(int life, int maxLife){
     printf("]");
 }
 
-void displayUsedLetter(char *usedLetter[26]){
+void displayUsedLetter(char usedLetter[26]){
     printf("\n\nLettre déjà utilisée : ");
     for (int i = 0; i < 26; i++)
     {
         if (usedLetter[i] != (void *)0)
         {
-            printf("%s, ", usedLetter[i]);
+            printf("%c, ", usedLetter[i]);
         }
     }
     printf("\n");
 }
 
-int addLetterToUsedLetter(char *usedLetter[26], char letter, int index){
-    usedLetter[index] = &letter;
-    return index + 1;
+int addLetterToUsedLetter(char usedLetter[26], char letter, int *index){
+    usedLetter[*index] = letter;
+    *index += 1;
 }
 
 /*
 Permet d'afficher le mot, un '_' si la lettre n'a pas encore été utilisée sinon la lettre
 */
-void display(char *word, char *usedLetter[26]){
+void display(char *word, char usedLetter[26]){
     int isUsed;
     printf("\n\n");
     //printf("---------------------");
@@ -85,10 +85,11 @@ int main(int argc, char const *argv[]){
 
     // Variables
     char *word; // Mot a deviné
-    char *usedLetter[26] = {NULL}; // Tableau qui contient les lettres que le joueur propose
+    char usedLetter[26] = {}; // Tableau qui contient les lettres que le joueur propose
     int numberOfUsedLettre = 0;
 
-    char choosenLetter; // Lettre choisie par le joueur
+    char choosenLetter[10]; // Lettre choisie par le joueur
+    char letter;
     int attempts = 0; // Nombre d'essai(s)
 
     int badTry = 0; // Nombre d'erreur(s)
@@ -107,20 +108,20 @@ int main(int argc, char const *argv[]){
         displayLife(current_life, maxLife);
         display(word, usedLetter);
         printf("CHOIX LETTRE : ");
-        scanf("%c", &choosenLetter);
-
+        scanf("%s", choosenLetter);
+        letter = choosenLetter[0];
         //printf("\nLETTRE CHOISIE : %c", choosenLetter);
 
-        switch (letterAlreadyUsed(choosenLetter, usedLetter)){
+        switch (letterAlreadyUsed(letter, usedLetter)){
         case 1:
-            printf("La lettre '%c' a déjà été utilisée\n", choosenLetter);
+            printf("La lettre '%c' a déjà été utilisée\n", letter);
             continue;
         case 0:
-            if (strchr(word, choosenLetter) == NULL) { // Si le mot de contient pas la lettre choisie
+            if (strchr(word, letter) == NULL) { // Si le mot de contient pas la lettre choisie
                 current_life ++;
             }
 
-            numberOfUsedLettre = addLetterToUsedLetter(usedLetter, choosenLetter, numberOfUsedLettre);
+            addLetterToUsedLetter(usedLetter, letter, &numberOfUsedLettre);
 
             displayUsedLetter(usedLetter);
             continue;
