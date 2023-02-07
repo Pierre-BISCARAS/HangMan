@@ -144,7 +144,7 @@ int main(int argc, char *argv[]){
             printf("La lettre '%c' a déjà été utilisée\n", letter);
             continue;
         case 0:
-            if (strchr(word, letter) == NULL) { // Si le mot de contient pas la lettre choisie
+            if (strchr(word, letter) == NULL && strchr(allLetters,letter)!=NULL) { // Si le mot de contient pas la lettre choisie
                 current_life ++;
             }
             if (strchr(allLetters,letter)==NULL)
@@ -157,8 +157,8 @@ int main(int argc, char *argv[]){
             }
             //displayUsedLetter(usedLetter);
             continue;
-        }
-        
+        }        
+
         attempts ++;
     } while(didPlayerWin(current_life, maxLife, word, usedLetter)==0);
 
