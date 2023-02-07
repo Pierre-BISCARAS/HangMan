@@ -28,6 +28,9 @@ int didPlayerWin(){
     return 0;
 }
 
+/*
+Permet l'affichage de la vie restante
+*/
 void displayLife(int life, int maxLife){
     printf("\n");
     printf("[ ");
@@ -40,11 +43,14 @@ void displayLife(int life, int maxLife){
     printf("]");
 }
 
+/*
+Permet l'affichage des lettres déjà utilisées
+*/
 void displayUsedLetter(char usedLetter[26]){
     printf("\n\nLettre déjà utilisée : ");
     for (int i = 0; i < 26; i++)
     {
-        if (usedLetter[i] != (void *)0)
+        if (usedLetter[i] != '\0')
         {
             printf("%c, ", usedLetter[i]);
         }
@@ -52,7 +58,10 @@ void displayUsedLetter(char usedLetter[26]){
     printf("\n");
 }
 
-int addLetterToUsedLetter(char usedLetter[26], char letter, int *index){
+/*
+Ajoute une lettre dans le tableau des lettres utilisées et incrémente l'index (numberOfUsedLetter)
+*/
+void addLetterToUsedLetter(char usedLetter[26], char letter, int *index){
     usedLetter[*index] = letter;
     *index += 1;
 }
@@ -63,8 +72,7 @@ Permet d'afficher le mot, un '_' si la lettre n'a pas encore été utilisée sin
 void display(char *word, char usedLetter[26]){
     int isUsed;
     printf("\n\n");
-    //printf("---------------------");
-    //printf("\n");
+
     // Parcours de chaque lettre du mot et si elle est dans la liste des lettres utilisées alors l'afficher
     for (int i = 0; i < strlen(word); i++)
     {
@@ -76,17 +84,16 @@ void display(char *word, char usedLetter[26]){
             printf("_ ");
         }
     }
-    //printf("\n");
-    //printf("---------------------");
+
     printf("\n\n");
 }
 
-int main(int argc, char const *argv[]){
+int main(int argc, char *argv[]){
 
     // Variables
     char *word; // Mot a deviné
     char usedLetter[26] = {}; // Tableau qui contient les lettres que le joueur propose
-    int numberOfUsedLettre = 0;
+    int numberOfUsedLetter = 0;
 
     char choosenLetter[10]; // Lettre choisie par le joueur
     char letter;
@@ -95,7 +102,7 @@ int main(int argc, char const *argv[]){
     int badTry = 0; // Nombre d'erreur(s)
     int maxLife = 5; // Nombre de vies
 
-    int current_life = 0;
+    int current_life = 0; // Nombre de vie perdu
 
     if (argc>0) {
 		word = argv[1];
@@ -109,8 +116,7 @@ int main(int argc, char const *argv[]){
         display(word, usedLetter);
         printf("CHOIX LETTRE : ");
         scanf("%s", choosenLetter);
-        letter = choosenLetter[0];
-        //printf("\nLETTRE CHOISIE : %c", choosenLetter);
+        letter = choosenLetter[0]; 
 
         switch (letterAlreadyUsed(letter, usedLetter)){
         case 1:
@@ -121,7 +127,7 @@ int main(int argc, char const *argv[]){
                 current_life ++;
             }
 
-            addLetterToUsedLetter(usedLetter, letter, &numberOfUsedLettre);
+            addLetterToUsedLetter(usedLetter, letter, &numberOfUsedLetter);
 
             displayUsedLetter(usedLetter);
             continue;
