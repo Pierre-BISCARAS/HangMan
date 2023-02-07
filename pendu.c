@@ -104,10 +104,17 @@ void display(char *word, char usedLetter[26]){
             printf("_ ");
         }
     }
-
     printf("\n\n");
 }
 
+/*
+Permet de stocker dans un tableau un message formater comme avec la fonction display()
+*/
+char* prepareToSend(char *word, char usedLetter[26]){
+    return word;
+}
+
+/*
 int main(int argc, char *argv[]){
 
     // Variables
@@ -173,3 +180,4 @@ int main(int argc, char *argv[]){
     
     return 0;
 }
+*/
