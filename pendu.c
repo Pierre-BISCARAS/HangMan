@@ -108,7 +108,7 @@ void display(char *word, char usedLetter[26]){
 }
 
 /*
-Permet de stocker dans un tableau un message formater comme avec la fonction display()
+Permet de stocker dans un tableau un message formaté comme avec la fonction display()
 */
 char* prepareToSend(char *word, char usedLetter[26]){
     return word;

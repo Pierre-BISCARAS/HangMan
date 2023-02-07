@@ -87,6 +87,15 @@ int main(int argc, char *argv[]){
     memset(messageRecu, 0x00, LG_MESSAGE*sizeof(char));
     printf("Attente d’une demande de connexion (quitter avec Ctrl-C)\n\n");
 
+    // c’est un appel bloquant
+    socketDialogue = accept(socketEcoute, (struct sockaddr *)&pointDeRencontreDistant, &longueurAdresse);
+    if (socketDialogue < 0) {
+        perror("accept");
+        close(socketDialogue);
+        close(socketEcoute);
+        exit(-4);
+    }
+
     printf("Un client vient de se connecter (quitter avec Ctrl-C)\n\n");
 
     //---------------------------------------------------------------------
@@ -94,14 +103,7 @@ int main(int argc, char *argv[]){
 
 	while(1){
 
-        // c’est un appel bloquant
-        socketDialogue = accept(socketEcoute, (struct sockaddr *)&pointDeRencontreDistant, &longueurAdresse);
-        if (socketDialogue < 0) {
-            perror("accept");
-            close(socketDialogue);
-            close(socketEcoute);
-            exit(-4);
-        }
+        
 
         //--------------------------------
         // Envoie de le message au client
@@ -140,8 +142,6 @@ int main(int argc, char *argv[]){
    				  return 0;
 			default:  /* réception de n octets */
 				  printf("Message reçu : %s \n\n", messageRecu);
-                  // On ferme la socket de dialogue et on se replace en attente ...
-                  close(socketDialogue);
 		}
 
         letter = messageRecu[0]; 
@@ -164,9 +164,7 @@ int main(int argc, char *argv[]){
             }
             continue;
         }        
-
         attempts ++;
-
 	}
 
     if (didPlayerWin(current_life, maxLife, word, usedLetter)==1)
