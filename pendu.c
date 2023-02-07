@@ -24,8 +24,28 @@ Permet de vérifier si le joueur a gagné.
 0 : Faux (La partie n'est pas terminée)
 -1 : Le joueur a perdu
 */
-int didPlayerWin(){
-    return 0;
+int didPlayerWin(int life, int maxLife, char *word, char usedLetter[26]){
+    int counter = 0;
+    if (life >= maxLife) // Le joueur n'a plus de vie
+    {
+        return -1;
+    }
+    for (int i = 0; i < strlen(word); i++)
+    {
+        if (letterAlreadyUsed(word[i],usedLetter))
+        {
+            counter++;
+        }
+        
+    }
+    if (counter == (int) strlen(word))
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 /*
@@ -92,6 +112,7 @@ int main(int argc, char *argv[]){
 
     // Variables
     char *word; // Mot a deviné
+    char allLetters[26] = "abcdefghijklmnopqrstuvwxyz"; // Tableau qui contient toutes les lettres de l'alphabet (lettre jouable)
     char usedLetter[26] = {}; // Tableau qui contient les lettres que le joueur propose
     int numberOfUsedLetter = 0;
 
@@ -104,7 +125,7 @@ int main(int argc, char *argv[]){
 
     int current_life = 0; // Nombre de vie perdu
 
-    if (argc>0) {
+    if (argc>1) {
 		word = argv[1];
 	} else {
 		printf("USAGE : %s MOT",argv[0]);
@@ -126,15 +147,29 @@ int main(int argc, char *argv[]){
             if (strchr(word, letter) == NULL) { // Si le mot de contient pas la lettre choisie
                 current_life ++;
             }
-
-            addLetterToUsedLetter(usedLetter, letter, &numberOfUsedLetter);
-
-            displayUsedLetter(usedLetter);
+            if (strchr(allLetters,letter)==NULL)
+            {
+                printf("Le caractère '%c' n'est pas utilisable\n", letter);
+            }
+            else
+            {
+                addLetterToUsedLetter(usedLetter, letter, &numberOfUsedLetter);
+            }
+            //displayUsedLetter(usedLetter);
             continue;
         }
         
         attempts ++;
-    } while(didPlayerWin()==0);
+    } while(didPlayerWin(current_life, maxLife, word, usedLetter)==0);
 
+    if (didPlayerWin(current_life, maxLife, word, usedLetter)==1)
+    {
+        printf("\nVous avez gagné ! Le mot était : %s", word);
+    } else if (didPlayerWin(current_life, maxLife, word, usedLetter)==-1)
+    {
+        printf("\nDommange vous avez perdu :( Le mot était : %s", word);
+    }
+    
+    
     return 0;
 }
