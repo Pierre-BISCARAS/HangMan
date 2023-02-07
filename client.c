@@ -74,10 +74,10 @@ int main(int argc, char *argv[]){
 				return 0;
 			default: /* réception de n octets */
 			messageRecu[nb]='\0';
-				printf("Message reçu du serveur : %s (%d octets)\n\n", messageRecu, nb);
-		}	// On ferme la ressource avant de quitter
-
-		scanf("%s", choosenLetter);
+				printf("Mot à deviner : %s\n", messageRecu);
+				printf("Donnez une lettre :\n");
+				scanf("%s", choosenLetter);
+		}		
 
 		// Envoi du message
 		switch(nb = write(descripteurSocket, choosenLetter, strlen(choosenLetter))){
