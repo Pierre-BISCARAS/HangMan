@@ -104,10 +104,28 @@ void display(char *word, char usedLetter[26]){
             printf("_ ");
         }
     }
-
     printf("\n\n");
 }
 
+/*
+Permet de stocker dans un tableau un message formaté comme avec la fonction display()
+*/
+char* prepareToSend(char *word, char usedLetter[26]){
+    char *toSend = (char *)malloc(100 * sizeof(char));
+    memset(toSend, 0, 100 * sizeof(char));
+    for (int i = 0; i < strlen(word); i++)
+    {
+        if(letterAlreadyUsed(word[i],usedLetter)==1){
+            toSend[strlen(toSend)] = word[i];
+            strcat(toSend," ");
+        } else {
+            strcat(toSend,"_ ");
+        }
+    }
+    return toSend;
+}
+
+/*
 int main(int argc, char *argv[]){
 
     // Variables
@@ -173,3 +191,4 @@ int main(int argc, char *argv[]){
     
     return 0;
 }
+*/

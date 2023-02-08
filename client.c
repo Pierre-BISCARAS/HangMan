@@ -73,9 +73,9 @@ int main(int argc, char *argv[]){
 			fprintf(stderr, "La socket a été fermée par le serveur !\n\n");
 				return 0;
 			default: /* réception de n octets */
-			messageRecu[nb]='\0';
+				messageRecu[nb]='\0';
 				printf("Mot à deviner : %s\n", messageRecu);
-				printf("Donnez une lettre :\n");
+				printf("Donnez une lettre : ");
 				scanf("%s", choosenLetter);
 		}		
 
@@ -89,7 +89,7 @@ int main(int argc, char *argv[]){
 				fprintf(stderr, "La socket a été fermée par le serveur !\n\n");
 				return 0;
 			default: /* envoi de n octets */
-				printf("La lettre à été envoyée\n");
+				printf("La lettre '%c' à été envoyée\n",choosenLetter[0]);
 		}
     }
 	close(descripteurSocket);
