@@ -114,7 +114,8 @@ char* prepareToSend(char *word, char usedLetter[26],char allLetters[26], char le
     char *toSend = (char *)malloc(100 * sizeof(char));
     char* message;
     memset(toSend, 0, 100 * sizeof(char));
-    strcat(toSend,"\nMot a deviner : ");
+    sprintf(toSend,"\nNombre de d'essais possibles : %i\nMot a deviner :",(maxLife - current_life));
+    //strcat(toSend,"\nMot a deviner : ");
     if (try == 0)
     {
         for (int i = 0; i < strlen(word); i++)
@@ -151,31 +152,19 @@ char* prepareToSend(char *word, char usedLetter[26],char allLetters[26], char le
     }
     if (didPlayerWin(current_life, maxLife, word, usedLetter)==1)
     {
-        message = "\nVous avez gagné ! ";
+        message = "\nVous avez gagné ! \nLe mot était :";
         char *target = (char *)malloc(100 * sizeof(char));
 
-        sprintf(target, "%s %s", message, toSend);
+        sprintf(target, "%s %s", message, word);
 
         return(target);
     } else if (didPlayerWin(current_life, maxLife, word, usedLetter)==-1)
     {
-        char *fullWord = (char *)malloc(100 * sizeof(char));
-        memset(fullWord, 0, 100 * sizeof(char));
 
-        for (int i = 0; i < strlen(word); i++)
-        {
-            if(letterAlreadyUsed(word[i],allLetters)==1){
-                fullWord[strlen(fullWord)] = word[i];
-                strcat(fullWord," ");
-            } else {
-                strcat(fullWord,"_ ");
-            }
-        }
-
-        message = "\nDommage vous avez perdu :( \nLe mot était : ";
+        message = "\nDommage vous avez perdu :( \nLe mot était :";
         char *target = (char *)malloc(100 * sizeof(char));
 
-        sprintf(target, "%s %s", message, fullWord);
+        sprintf(target, "%s %s", message, word);
 
         return(target);
     }
