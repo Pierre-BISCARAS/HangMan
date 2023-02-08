@@ -33,7 +33,7 @@ int main(int argc, char *argv[]){
     char usedLetter[26] = {}; // Tableau qui contient les lettres que le joueur propose
     int numberOfUsedLetter = 0;
 
-    char letter;
+    char letter = '$';
     int attempts = 0; // Nombre d'essai(s)
 
     int badTry = 0; // Nombre d'erreur(s)
@@ -65,7 +65,7 @@ int main(int argc, char *argv[]){
 
 	memset(&pointDeRencontreLocal, 0x00, longueurAdresse); pointDeRencontreLocal.sin_family = PF_INET;
 	pointDeRencontreLocal.sin_addr.s_addr = htonl(INADDR_ANY); // attaché à toutes les interfaces locales disponibles
-	pointDeRencontreLocal.sin_port = htons(5050); // = 5000 ou plus
+	pointDeRencontreLocal.sin_port = htons(5051); // = 5000 ou plus
 	
 	// On demande l’attachement local de la socket
 	if((bind(socketEcoute, (struct sockaddr *)&pointDeRencontreLocal, longueurAdresse)) < 0) {
@@ -106,7 +106,7 @@ int main(int argc, char *argv[]){
         //--------------------------------
         // Envoie de le message au client
 
-        strcpy(messageEnvoi,prepareToSend(word,usedLetter));
+        strcpy(messageEnvoi,prepareToSend(word,usedLetter,allLetters,letter,&numberOfUsedLetter,attempts,current_life,maxLife));
 
 		// On envoie des données vers le client (cf. protocole)
 		ecrits = write(socketDialogue, messageEnvoi, strlen(messageEnvoi)); 
@@ -122,6 +122,13 @@ int main(int argc, char *argv[]){
 			default:  /* envoi de n octets */
    				  printf("Message envoyé : %s\n\n", messageEnvoi);
 		}
+
+		if (strcmp(&messageEnvoi,"Vous avez gagné !") == 0 || strcmp(&messageEnvoi,"Dommange vous avez perdu :(") == 0)
+		{
+			close(socketDialogue); 
+			exit(-7);
+		}
+		
 
         //-------------------------------------------------
         // Reception et traitement de la réponse du client
@@ -144,33 +151,14 @@ int main(int argc, char *argv[]){
         letter = messageRecu[0]; 
 
         switch (letterAlreadyUsed(letter, usedLetter)){
-        case 1:
-            printf("La lettre '%c' a déjà été utilisée\n", letter);
-            continue;
         case 0:
             if (strchr(word, letter) == NULL && strchr(allLetters,letter)!=NULL) { // Si le mot de contient pas la lettre choisie
                 current_life ++;
             }
-            if (strchr(allLetters,letter)==NULL)
-            {
-                printf("Le caractère '%c' n'est pas utilisable\n", letter);
-            }
-            else
-            {
-                addLetterToUsedLetter(usedLetter, letter, &numberOfUsedLetter);
-            }
-            continue;
-        }        
+        }  
         attempts ++;
 	}
 
-    if (didPlayerWin(current_life, maxLife, word, usedLetter)==1)
-    {
-        printf("\nVous avez gagné ! Le mot était : %s", word);
-    } else if (didPlayerWin(current_life, maxLife, word, usedLetter)==-1)
-    {
-        printf("\nDommange vous avez perdu :( Le mot était : %s", word);
-    }
 
 	// On ferme la ressource avant de quitter
    	close(socketEcoute);

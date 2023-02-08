@@ -110,18 +110,53 @@ void display(char *word, char usedLetter[26]){
 /*
 Permet de stocker dans un tableau un message formaté comme avec la fonction display()
 */
-char* prepareToSend(char *word, char usedLetter[26]){
+char* prepareToSend(char *word, char usedLetter[26],char allLetters[26], char letter, int *numberOfUsedLetter, int try,int current_life, int maxLife){
     char *toSend = (char *)malloc(100 * sizeof(char));
     memset(toSend, 0, 100 * sizeof(char));
-    for (int i = 0; i < strlen(word); i++)
+    if (try == 0)
     {
-        if(letterAlreadyUsed(word[i],usedLetter)==1){
-            toSend[strlen(toSend)] = word[i];
-            strcat(toSend," ");
-        } else {
-            strcat(toSend,"_ ");
-        }
+        for (int i = 0; i < strlen(word); i++)
+            {
+                if(letterAlreadyUsed(word[i],usedLetter)==1){
+                    toSend[strlen(toSend)] = word[i];
+                    strcat(toSend," ");
+                } else {
+                    strcat(toSend,"_ ");
+                }
+            }
     }
+    else
+    {
+        switch (letterAlreadyUsed(letter, usedLetter)){
+        case 1:
+            return ("La lettre a déjà été utilisée");
+        case 0:
+            if (strchr(allLetters,letter)==NULL)
+            {
+                return ("Le caractère n'est pas utilisable");
+            }
+            addLetterToUsedLetter(usedLetter,letter,numberOfUsedLetter);
+            for (int i = 0; i < strlen(word); i++)
+            {
+                if(letterAlreadyUsed(word[i],usedLetter)==1){
+                    toSend[strlen(toSend)] = word[i];
+                    strcat(toSend," ");
+                } else {
+                    strcat(toSend,"_ ");
+                }
+            }
+        } 
+    }
+
+    if (didPlayerWin(current_life, maxLife, word, usedLetter)==1)
+    {
+        return("Vous avez gagné !");
+    } else if (didPlayerWin(current_life, maxLife, word, usedLetter)==-1)
+    {
+        return("Dommange vous avez perdu :(");
+    }
+    
+    
     return toSend;
 }
 
