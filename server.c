@@ -122,12 +122,6 @@ int main(int argc, char *argv[]){
 			default:  /* envoi de n octets */
    				  printf("Message envoyé : %s\n\n", messageEnvoi);
 		}
-
-		if (strcmp(&messageEnvoi,"Vous avez gagné !") == 0 || strcmp(&messageEnvoi,"Dommange vous avez perdu :(") == 0)
-		{
-			close(socketDialogue); 
-			exit(-7);
-		}
 		
 
         //-------------------------------------------------

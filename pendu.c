@@ -112,7 +112,9 @@ Permet de stocker dans un tableau un message formaté comme avec la fonction dis
 */
 char* prepareToSend(char *word, char usedLetter[26],char allLetters[26], char letter, int *numberOfUsedLetter, int try,int current_life, int maxLife){
     char *toSend = (char *)malloc(100 * sizeof(char));
+    char* message;
     memset(toSend, 0, 100 * sizeof(char));
+    strcat(toSend,"\nMot a deviner : ");
     if (try == 0)
     {
         for (int i = 0; i < strlen(word); i++)
@@ -129,11 +131,11 @@ char* prepareToSend(char *word, char usedLetter[26],char allLetters[26], char le
     {
         switch (letterAlreadyUsed(letter, usedLetter)){
         case 1:
-            return ("La lettre a déjà été utilisée");
+            return ("\nLa lettre a déjà été utilisée");
         case 0:
             if (strchr(allLetters,letter)==NULL)
             {
-                return ("Le caractère n'est pas utilisable");
+                return ("\nLe caractère n'est pas utilisable");
             }
             addLetterToUsedLetter(usedLetter,letter,numberOfUsedLetter);
             for (int i = 0; i < strlen(word); i++)
@@ -147,16 +149,24 @@ char* prepareToSend(char *word, char usedLetter[26],char allLetters[26], char le
             }
         } 
     }
-
     if (didPlayerWin(current_life, maxLife, word, usedLetter)==1)
     {
-        return("Vous avez gagné !");
+        message = "\nVous avez gagné ! ";
+        char *target = (char *)malloc(100 * sizeof(char));
+
+        sprintf(target, "%s %s", message, toSend);
+
+        return(target);
     } else if (didPlayerWin(current_life, maxLife, word, usedLetter)==-1)
     {
-        return("Dommange vous avez perdu :(");
+        message = "\nDommage vous avez perdu :( ";
+        char *target = (char *)malloc(100 * sizeof(char));
+
+        sprintf(target, "%s %s", message, toSend);
+
+        return(target);
     }
-    
-    
+
     return toSend;
 }
 
