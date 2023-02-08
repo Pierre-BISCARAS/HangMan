@@ -151,25 +151,20 @@ char* prepareToSend(char *word, char usedLetter[26],char allLetters[26], char le
     }
     if (didPlayerWin(current_life, maxLife, word, usedLetter)==1)
     {
-        int i, j;
-        message = "\nVous avez gagné ! Le ";
+        message = "\nVous avez gagné ! ";
+        char *target = (char *)malloc(100 * sizeof(char));
 
-        for (i = 0; message[i]!='\0'; i++){
-            for (j = 0; toSend[j]!='\0'; j++, i++)
-            {
-                message[i] = toSend[j];
-            }
-            message[i] = '\0';
-        }
-  
-        
+        sprintf(target, "%s %s", message, toSend);
 
-        return(message);
+        return(target);
     } else if (didPlayerWin(current_life, maxLife, word, usedLetter)==-1)
     {
-        message = "\nDommage vous avez perdu :( Le ";
-        strcat(message,toSend);
-        return(message);
+        message = "\nDommage vous avez perdu :( ";
+        char *target = (char *)malloc(100 * sizeof(char));
+
+        sprintf(target, "%s %s", message, toSend);
+
+        return(target);
     }
 
     return toSend;
