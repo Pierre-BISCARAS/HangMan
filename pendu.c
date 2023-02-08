@@ -159,7 +159,7 @@ char* prepareToSend(char *word, char usedLetter[26],char allLetters[26], char le
         return(target);
     } else if (didPlayerWin(current_life, maxLife, word, usedLetter)==-1)
     {
-        message = "\nDommage vous avez perdu :( ";
+        message = "\nDommage vous avez perdu :(";
         char *target = (char *)malloc(100 * sizeof(char));
 
         sprintf(target, "%s %s", message, toSend);

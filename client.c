@@ -76,7 +76,7 @@ int main(int argc, char *argv[]){
 				messageRecu[nb]='\0';
 				printf("%s\n", messageRecu);
 				
-				if (strstr(&messageRecu,"\nVous avez gagné !") || strstr(&messageRecu,"\nDommange vous avez perdu :("))
+				if (strstr(&messageRecu,"\nVous avez gagné !") || strstr(&messageRecu,"\nDommage vous avez perdu :("))
 				{
 					close(descripteurSocket); 
 					exit(-5);
