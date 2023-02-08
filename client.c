@@ -74,10 +74,19 @@ int main(int argc, char *argv[]){
 				return 0;
 			default: /* réception de n octets */
 				messageRecu[nb]='\0';
-				printf("Mot à deviner : %s\n", messageRecu);
-				printf("Donnez une lettre : ");
-				scanf("%s", choosenLetter);
-		}		
+				printf("%s\n", messageRecu);
+				
+				if (strstr(&messageRecu,"\nVous avez gagné !") || strstr(&messageRecu,"\nDommange vous avez perdu :("))
+				{
+					close(descripteurSocket); 
+					exit(-5);
+				} else {
+					printf("Donnez une lettre : ");
+					scanf("%s", choosenLetter);
+				}
+		}
+
+			
 
 		// Envoi du message
 		switch(nb = write(descripteurSocket, choosenLetter, strlen(choosenLetter))){
@@ -88,8 +97,8 @@ int main(int argc, char *argv[]){
 			case 0 : /* la socket est fermée */
 				fprintf(stderr, "La socket a été fermée par le serveur !\n\n");
 				return 0;
-			default: /* envoi de n octets */
-				printf("La lettre '%c' à été envoyée\n",choosenLetter[0]);
+			//default: 
+				//printf("\nLa lettre '%c' à été envoyée\n",choosenLetter[0]);
 		}
     }
 	close(descripteurSocket);
