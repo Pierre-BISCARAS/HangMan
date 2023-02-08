@@ -159,10 +159,23 @@ char* prepareToSend(char *word, char usedLetter[26],char allLetters[26], char le
         return(target);
     } else if (didPlayerWin(current_life, maxLife, word, usedLetter)==-1)
     {
-        message = "\nDommage vous avez perdu :(";
+        char *fullWord = (char *)malloc(100 * sizeof(char));
+        memset(fullWord, 0, 100 * sizeof(char));
+
+        for (int i = 0; i < strlen(word); i++)
+        {
+            if(letterAlreadyUsed(word[i],allLetters)==1){
+                fullWord[strlen(fullWord)] = word[i];
+                strcat(fullWord," ");
+            } else {
+                strcat(fullWord,"_ ");
+            }
+        }
+
+        message = "\nDommage vous avez perdu :( \nLe mot était : ";
         char *target = (char *)malloc(100 * sizeof(char));
 
-        sprintf(target, "%s %s", message, toSend);
+        sprintf(target, "%s %s", message, fullWord);
 
         return(target);
     }
