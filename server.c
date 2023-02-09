@@ -20,26 +20,33 @@ int main(int argc, char *argv[]){
 	struct sockaddr_in pointDeRencontreLocal;
 	socklen_t longueurAdresse;
 
-	int socketDialogue;
+	int socketDialogue1;
+	int socketDialogue2;
 	struct sockaddr_in pointDeRencontreDistant;
-	char messageRecu[LG_MESSAGE];
-	char messageEnvoi[LG_MESSAGE];
+	char messageRecu1[LG_MESSAGE];
+	char messageRecu2[LG_MESSAGE];
+	char messageEnvoi1[LG_MESSAGE];
+	char messageEnvoi2[LG_MESSAGE];
 	int ecrits, lus; /* nb d’octets ecrits et lus */
 	int retour;
 
     // Variables jeu
     char *word; // Mot a deviné
     char allLetters[26] = "abcdefghijklmnopqrstuvwxyz"; // Tableau qui contient toutes les lettres de l'alphabet (lettre jouable)
-    char usedLetter[26] = {}; // Tableau qui contient les lettres que le joueur propose
-    int numberOfUsedLetter = 0;
+    char usedLetter1[26] = {}; // Tableau qui contient les lettres que le joueur propose
+    char usedLetter2[26] = {}; // Tableau qui contient les lettres que le joueur propose
+    int numberOfUsedLetter1 = 0;
+    int numberOfUsedLetter2 = 0;
 
-    char letter = '$';
-    int attempts = 0; // Nombre d'essai(s)
+    char letter1 = '$';
+    char letter2 = '$';
+    int attempts1 = 0; // Nombre d'essai(s)
+    int attempts2 = 0; // Nombre d'essai(s)
 
-    int badTry = 0; // Nombre d'erreur(s)
     int maxLife = 5; // Nombre de vies
 
-    int current_life = 0; // Nombre de vie perdu
+    int current_life1 = 0; // Nombre de vie perdu
+    int current_life2 = 0; // Nombre de vie perdu
     
     if (argc>1) {
 		word = argv[1];
@@ -84,73 +91,130 @@ int main(int argc, char *argv[]){
     //---------------------------------------------------------------------
     // Attente d'une conexion
 	
-    memset(messageRecu, 0x00, LG_MESSAGE*sizeof(char));
+    memset(messageRecu1, 0x00, LG_MESSAGE*sizeof(char));
+	memset(messageRecu2, 0x00, LG_MESSAGE*sizeof(char));
     printf("\nAttente d’une demande de connexion (quitter avec Ctrl-C)\n\n");
 
     // c’est un appel bloquant
-    socketDialogue = accept(socketEcoute, (struct sockaddr *)&pointDeRencontreDistant, &longueurAdresse);
-    if (socketDialogue < 0) {
+    socketDialogue1 = accept(socketEcoute, (struct sockaddr *)&pointDeRencontreDistant, &longueurAdresse);
+    if (socketDialogue1 < 0) {
         perror("accept");
-        close(socketDialogue);
+        close(socketDialogue1);
         close(socketEcoute);
         exit(-4);
     }
 
-    printf("Un client vient de se connecter\n\n");
+	printf("Le client 1 vient de se connecter\n\n");
+	printf("Attente d'un deuxième client\n\n");
+
+	socketDialogue2 = accept(socketEcoute, (struct sockaddr *)&pointDeRencontreDistant, &longueurAdresse);
+    if (socketDialogue2 < 0) {
+        perror("accept");
+        close(socketDialogue2);
+        close(socketEcoute);
+        exit(-4);
+    }
+
+    printf("Le client 2 vient de se connecter\n\n");
+    printf("Le jeu peut commencer\n\n");
 
     //---------------------------------------------------------------------
     // Boucle du jeu
 
 	while(1){
 
-        //--------------------------------
-        // Envoie de le message au client
+		//---------------------------------
+        // Envoie de le message au client 2
 
-        strcpy(messageEnvoi,prepareToSend(word,usedLetter,allLetters,letter,&numberOfUsedLetter,attempts,current_life,maxLife));
+		strcpy(messageEnvoi2,prepareToSend(word,usedLetter2,allLetters,letter2,&numberOfUsedLetter2,attempts2,current_life2,maxLife));
 
 		// On envoie des données vers le client (cf. protocole)
-		ecrits = write(socketDialogue, messageEnvoi, strlen(messageEnvoi)); 
+		ecrits = write(socketDialogue2, messageEnvoi2, strlen(messageEnvoi2)); 
 		switch(ecrits){
 			case -1 : /* une erreur ! */
 				  perror("write");
-   				  close(socketDialogue);
-   				  exit(-6);
+   				  close(socketDialogue2);
 			case 0 :  /* la socket est fermée */
 				  fprintf(stderr, "La socket a été fermée par le client !\n\n");
-				  close(socketDialogue);
-				  return 0;
+				  close(socketDialogue2);
 			default:  /* envoi de n octets */
-   				  printf("Message envoyé : %s\n\n", messageEnvoi);
+   				  printf("\nMessage envoyé : %s\n\n", messageEnvoi2);
 		}
 		
 
-        //-------------------------------------------------
-        // Reception et traitement de la réponse du client
+        //--------------------------------------------------
+        // Reception et traitement de la réponse du client 2
 		
 		// On réception les données du client (cf. protocole)
-		lus = read(socketDialogue, messageRecu, LG_MESSAGE*sizeof(char)); // ici appel bloquant
+		lus = read(socketDialogue2, messageRecu2, LG_MESSAGE*sizeof(char)); // ici appel bloquant
 		switch(lus) {
 			case -1 : /* une erreur ! */ 
 				  perror("read"); 
-				  close(socketDialogue); 
+				  close(socketDialogue2); 
 				  exit(-5);
 			case 0  : /* la socket est fermée */
 				  fprintf(stderr, "La socket a été fermée par le client !\n\n");
-   				  close(socketDialogue);
-   				  return 0;
+   				  close(socketDialogue2);
 			default:  /* réception de n octets */
-				  printf("Message reçu : %s \n\n", messageRecu);
+				  printf("\nMessage reçu : %s \n\n", messageRecu2);
 		}
 
-        letter = messageRecu[0]; 
+        letter2 = messageRecu2[0]; 
 
-        switch (letterAlreadyUsed(letter, usedLetter)){
+        switch (letterAlreadyUsed(letter2, usedLetter2)){
         case 0:
-            if (strchr(word, letter) == NULL && strchr(allLetters,letter)!=NULL) { // Si le mot de contient pas la lettre choisie
-                current_life ++;
+            if (strchr(word, letter2) == NULL && strchr(allLetters,letter2)!=NULL) { // Si le mot de contient pas la lettre choisie
+                current_life2 ++;
             }
         }  
-        attempts ++;
+        attempts2 ++;
+
+        //---------------------------------
+        // Envoie de le message au client 1
+
+        strcpy(messageEnvoi1,prepareToSend(word,usedLetter1,allLetters,letter1,&numberOfUsedLetter1,attempts1,current_life1,maxLife));
+
+		// On envoie des données vers le client (cf. protocole)
+		ecrits = write(socketDialogue1, messageEnvoi1, strlen(messageEnvoi1)); 
+		switch(ecrits){
+			case -1 : /* une erreur ! */
+				  perror("write");
+   				  close(socketDialogue1);
+   				  exit(-6);
+			case 0 :  /* la socket est fermée */
+				  fprintf(stderr, "La socket a été fermée par le client !\n\n");
+				  close(socketDialogue1);
+			default:  /* envoi de n octets */
+   				  printf("\nMessage envoyé : %s\n\n", messageEnvoi1);
+		}
+		
+
+        //--------------------------------------------------
+        // Reception et traitement de la réponse du client 1
+		
+		// On réception les données du client (cf. protocole)
+		lus = read(socketDialogue1, messageRecu1, LG_MESSAGE*sizeof(char)); // ici appel bloquant
+		switch(lus) {
+			case -1 : /* une erreur ! */ 
+				  perror("read"); 
+				  close(socketDialogue1); 
+				  exit(-5);
+			case 0  : /* la socket est fermée */
+				  fprintf(stderr, "La socket a été fermée par le client !\n\n");
+   				  close(socketDialogue1);
+			default:  /* réception de n octets */
+				  printf("\nMessage reçu : %s \n\n", messageRecu1);
+		}
+
+        letter1 = messageRecu1[0]; 
+
+        switch (letterAlreadyUsed(letter1, usedLetter1)){
+        case 0:
+            if (strchr(word, letter1) == NULL && strchr(allLetters,letter1)!=NULL) { // Si le mot de contient pas la lettre choisie
+                current_life1 ++;
+            }
+        }  
+        attempts1 ++;
 	}
 
 

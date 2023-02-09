@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <string.h>
 
+
 /*
 Permet de vérifier si une lettre a déjà été utlisée.
 1 : Vrai
@@ -115,7 +116,6 @@ char* prepareToSend(char *word, char usedLetter[26],char allLetters[26], char le
     char* message;
     memset(toSend, 0, 100 * sizeof(char));
     sprintf(toSend,"\nNombre de d'essais possibles : %i\nMot a deviner :",(maxLife - current_life));
-    //strcat(toSend,"\nMot a deviner : ");
     if (try == 0)
     {
         for (int i = 0; i < strlen(word); i++)

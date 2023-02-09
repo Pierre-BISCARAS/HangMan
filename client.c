@@ -76,7 +76,7 @@ int main(int argc, char *argv[]){
 				messageRecu[nb]='\0';
 				printf("%s\n", messageRecu);
 				
-				if (strstr(&messageRecu,"\nVous avez gagné !") || strstr(&messageRecu,"\nDommage vous avez perdu :("))
+				if (strstr(messageRecu,"\nVous avez gagné !") || strstr(messageRecu,"\nDommage vous avez perdu :("))
 				{
 					close(descripteurSocket); 
 					exit(-5);
@@ -85,8 +85,6 @@ int main(int argc, char *argv[]){
 					scanf("%s", choosenLetter);
 				}
 		}
-
-			
 
 		// Envoi du message
 		switch(nb = write(descripteurSocket, choosenLetter, strlen(choosenLetter))){
@@ -102,7 +100,4 @@ int main(int argc, char *argv[]){
 		}
     }
 	close(descripteurSocket);
-    
-
-
 }
