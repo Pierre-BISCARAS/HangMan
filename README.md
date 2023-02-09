@@ -1,6 +1,6 @@
 # HangMan Game
 
-This project is a hangman game coded in C language. At first, we launch the server with a chosen word, then a client connects to the server and the game can start !
+This project is a hangman game coded in C language. At first, we launch the server with a chosen word, then a client connect to the server and the game can start !
 
 ## Requirements
 
