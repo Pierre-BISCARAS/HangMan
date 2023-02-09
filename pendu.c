@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <string.h>
 
+
 /*
 Permet de vérifier si une lettre a déjà été utlisée.
 1 : Vrai
@@ -110,12 +111,11 @@ void display(char *word, char usedLetter[26]){
 /*
 Permet de stocker dans un tableau un message formaté comme avec la fonction display()
 */
-char* prepareToSend(char *word, char usedLetter[26],char allLetters[26], char letter, int *numberOfUsedLetter, int try,int current_life, int maxLife){
+char* prepareToSend(char *word, char usedLetter[26],char allLetters[26], char letter, int *numberOfUsedLetter, int try,int current_life, int maxLife, int* end){
     char *toSend = (char *)malloc(100 * sizeof(char));
     char* message;
     memset(toSend, 0, 100 * sizeof(char));
-    sprintf(toSend,"\nNombre de d'essais possibles : %i\nMot a deviner :",(maxLife - current_life));
-    //strcat(toSend,"\nMot a deviner : ");
+    sprintf(toSend,"\nNombre de d'essais restants : %i\nMot a deviner :",(maxLife - current_life));
     if (try == 0)
     {
         for (int i = 0; i < strlen(word); i++)
@@ -157,6 +157,8 @@ char* prepareToSend(char *word, char usedLetter[26],char allLetters[26], char le
 
         sprintf(target, "%s %s", message, word);
 
+        *end+=1;
+
         return(target);
     } else if (didPlayerWin(current_life, maxLife, word, usedLetter)==-1)
     {
@@ -166,76 +168,10 @@ char* prepareToSend(char *word, char usedLetter[26],char allLetters[26], char le
 
         sprintf(target, "%s %s", message, word);
 
+        *end+=1;
+
         return(target);
     }
 
     return toSend;
 }
-
-/*
-int main(int argc, char *argv[]){
-
-    // Variables
-    char *word; // Mot a deviné
-    char allLetters[26] = "abcdefghijklmnopqrstuvwxyz"; // Tableau qui contient toutes les lettres de l'alphabet (lettre jouable)
-    char usedLetter[26] = {}; // Tableau qui contient les lettres que le joueur propose
-    int numberOfUsedLetter = 0;
-
-    char choosenLetter[10]; // Lettre choisie par le joueur
-    char letter;
-    int attempts = 0; // Nombre d'essai(s)
-
-    int badTry = 0; // Nombre d'erreur(s)
-    int maxLife = 5; // Nombre de vies
-
-    int current_life = 0; // Nombre de vie perdu
-
-    if (argc>1) {
-		word = argv[1];
-	} else {
-		printf("USAGE : %s MOT",argv[0]);
-		exit(-1);
-	}
-
-    do{
-        displayLife(current_life, maxLife);
-        display(word, usedLetter);
-        printf("CHOIX LETTRE : ");
-        scanf("%s", choosenLetter);
-        letter = choosenLetter[0]; 
-
-        switch (letterAlreadyUsed(letter, usedLetter)){
-        case 1:
-            printf("La lettre '%c' a déjà été utilisée\n", letter);
-            continue;
-        case 0:
-            if (strchr(word, letter) == NULL && strchr(allLetters,letter)!=NULL) { // Si le mot de contient pas la lettre choisie
-                current_life ++;
-            }
-            if (strchr(allLetters,letter)==NULL)
-            {
-                printf("Le caractère '%c' n'est pas utilisable\n", letter);
-            }
-            else
-            {
-                addLetterToUsedLetter(usedLetter, letter, &numberOfUsedLetter);
-            }
-            //displayUsedLetter(usedLetter);
-            continue;
-        }        
-
-        attempts ++;
-    } while(didPlayerWin(current_life, maxLife, word, usedLetter)==0);
-
-    if (didPlayerWin(current_life, maxLife, word, usedLetter)==1)
-    {
-        printf("\nVous avez gagné ! Le mot était : %s", word);
-    } else if (didPlayerWin(current_life, maxLife, word, usedLetter)==-1)
-    {
-        printf("\nDommange vous avez perdu :( Le mot était : %s", word);
-    }
-    
-    
-    return 0;
-}
-*/
