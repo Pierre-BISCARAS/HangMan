@@ -195,8 +195,6 @@ int main(int argc, char *argv[]){
 				printf("\nMessage reçu : %s \n\n", messageRecu2);
 		}
 
-		printf("\nMESSAGERECU2 : %s\n",messageRecu2);
-
 		strcpy(messageEnvoi1,&messageRecu2[0]);
 
 		// On envoie des données vers le client (cf. protocole)
