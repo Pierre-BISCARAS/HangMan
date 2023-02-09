@@ -144,7 +144,6 @@ int main(int argc, char *argv[]){
 				default:  /* envoi de n octets */
 					printf("\nMessage envoyé : %s\n\n", messageEnvoi2);
 			}
-			
 
 			//--------------------------------------------------
 			// Reception et traitement de la réponse du client 2
@@ -174,7 +173,6 @@ int main(int argc, char *argv[]){
 				}  
 			}
 			
-			
 			attempts2 ++;
 		}
 
@@ -183,7 +181,7 @@ int main(int argc, char *argv[]){
 
         strcpy(messageEnvoi1,prepareToSend(word,usedLetter1,allLetters,letter1,&numberOfUsedLetter1,attempts1,current_life1,maxLife,&end1));
 
-		if (end1 == 0 || end2 == 1){
+		if (end1 == 0 || end1 == 1){
 			// On envoie des données vers le client (cf. protocole)
 			ecrits = write(socketDialogue1, messageEnvoi1, strlen(messageEnvoi1)); 
 			switch(ecrits){
@@ -197,7 +195,7 @@ int main(int argc, char *argv[]){
 				default:  /* envoi de n octets */
 					printf("\nMessage envoyé : %s\n\n", messageEnvoi1);
 			}
-			
+		
 
 			//--------------------------------------------------
 			// Reception et traitement de la réponse du client 1
