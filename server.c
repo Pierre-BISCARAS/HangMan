@@ -143,6 +143,10 @@ int main(int argc, char *argv[]){
 					close(socketDialogue2);
 				default:  /* envoi de n octets */
 					printf("\nMessage envoyé : %s\n\n", messageEnvoi2);
+					if (end2 == 1)
+					{
+						end2 = 2;
+					}
 			}
 
 			//--------------------------------------------------
@@ -192,8 +196,13 @@ int main(int argc, char *argv[]){
 				case 0 :  /* la socket est fermée */
 					fprintf(stderr, "La socket a été fermée par le client !\n\n");
 					close(socketDialogue1);
+					exit(-7);
 				default:  /* envoi de n octets */
 					printf("\nMessage envoyé : %s\n\n", messageEnvoi1);
+					if (end1==1)
+					{
+						end2 = 2;
+					}
 			}
 		
 
@@ -212,6 +221,7 @@ int main(int argc, char *argv[]){
 					case 0  : /* la socket est fermée */
 						fprintf(stderr, "La socket a été fermée par le client !\n\n");
 						close(socketDialogue1);
+						exit(-8);
 					default:  /* réception de n octets */
 						printf("\nMessage reçu : %s \n\n", messageRecu1);
 				}

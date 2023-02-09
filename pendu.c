@@ -157,7 +157,7 @@ char* prepareToSend(char *word, char usedLetter[26],char allLetters[26], char le
 
         sprintf(target, "%s %s", message, word);
 
-        *end=1;
+        *end+=1;
 
         return(target);
     } else if (didPlayerWin(current_life, maxLife, word, usedLetter)==-1)
@@ -168,7 +168,7 @@ char* prepareToSend(char *word, char usedLetter[26],char allLetters[26], char le
 
         sprintf(target, "%s %s", message, word);
 
-        *end=1;
+        *end+=1;
 
         return(target);
     }
