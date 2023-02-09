@@ -42,6 +42,8 @@ int main(int argc, char *argv[]){
     char letter2 = '$';
     int attempts1 = 0; // Nombre d'essai(s)
     int attempts2 = 0; // Nombre d'essai(s)
+	int end1 = 0;
+	int end2 = 0;
 
     int maxLife = 5; // Nombre de vies
 
@@ -72,7 +74,7 @@ int main(int argc, char *argv[]){
 
 	memset(&pointDeRencontreLocal, 0x00, longueurAdresse); pointDeRencontreLocal.sin_family = PF_INET;
 	pointDeRencontreLocal.sin_addr.s_addr = htonl(INADDR_ANY); // attaché à toutes les interfaces locales disponibles
-	pointDeRencontreLocal.sin_port = htons(5051); // = 5000 ou plus
+	pointDeRencontreLocal.sin_port = htons(5050); // = 5000 ou plus
 	
 	// On demande l’attachement local de la socket
 	if((bind(socketEcoute, (struct sockaddr *)&pointDeRencontreLocal, longueurAdresse)) < 0) {
@@ -126,97 +128,111 @@ int main(int argc, char *argv[]){
 		//---------------------------------
         // Envoie de le message au client 2
 
-		strcpy(messageEnvoi2,prepareToSend(word,usedLetter2,allLetters,letter2,&numberOfUsedLetter2,attempts2,current_life2,maxLife));
+		strcpy(messageEnvoi2,prepareToSend(word,usedLetter2,allLetters,letter2,&numberOfUsedLetter2,attempts2,current_life2,maxLife, &end2));
 
-		// On envoie des données vers le client (cf. protocole)
-		ecrits = write(socketDialogue2, messageEnvoi2, strlen(messageEnvoi2)); 
-		switch(ecrits){
-			case -1 : /* une erreur ! */
-				  perror("write");
-   				  close(socketDialogue2);
-			case 0 :  /* la socket est fermée */
-				  fprintf(stderr, "La socket a été fermée par le client !\n\n");
-				  close(socketDialogue2);
-			default:  /* envoi de n octets */
-   				  printf("\nMessage envoyé : %s\n\n", messageEnvoi2);
+		if (end2 == 0 || end2 == 1)
+		{
+			// On envoie des données vers le client (cf. protocole)
+			ecrits = write(socketDialogue2, messageEnvoi2, strlen(messageEnvoi2)); 
+			switch(ecrits){
+				case -1 : /* une erreur ! */
+					perror("write");
+					close(socketDialogue2);
+				case 0 :  /* la socket est fermée */
+					fprintf(stderr, "La socket a été fermée par le client !\n\n");
+					close(socketDialogue2);
+				default:  /* envoi de n octets */
+					printf("\nMessage envoyé : %s\n\n", messageEnvoi2);
+			}
+			
+
+			//--------------------------------------------------
+			// Reception et traitement de la réponse du client 2
+			if (end2 == 0)
+			{
+				// On réception les données du client (cf. protocole)
+				lus = read(socketDialogue2, messageRecu2, LG_MESSAGE*sizeof(char)); // ici appel bloquant
+				switch(lus) {
+					case -1 : /* une erreur ! */ 
+						perror("read"); 
+						close(socketDialogue2); 
+						exit(-5);
+					case 0  : /* la socket est fermée */
+						fprintf(stderr, "La socket a été fermée par le client !\n\n");
+						close(socketDialogue2);
+					default:  /* réception de n octets */
+						printf("\nMessage reçu : %s \n\n", messageRecu2);
+				}
+
+				letter2 = messageRecu2[0]; 
+
+				switch (letterAlreadyUsed(letter2, usedLetter2)){
+				case 0:
+					if (strchr(word, letter2) == NULL && strchr(allLetters,letter2)!=NULL) { // Si le mot de contient pas la lettre choisie
+						current_life2 ++;
+					}
+				}  
+			}
+			
+			
+			attempts2 ++;
 		}
-		
-
-        //--------------------------------------------------
-        // Reception et traitement de la réponse du client 2
-		
-		// On réception les données du client (cf. protocole)
-		lus = read(socketDialogue2, messageRecu2, LG_MESSAGE*sizeof(char)); // ici appel bloquant
-		switch(lus) {
-			case -1 : /* une erreur ! */ 
-				  perror("read"); 
-				  close(socketDialogue2); 
-				  exit(-5);
-			case 0  : /* la socket est fermée */
-				  fprintf(stderr, "La socket a été fermée par le client !\n\n");
-   				  close(socketDialogue2);
-			default:  /* réception de n octets */
-				  printf("\nMessage reçu : %s \n\n", messageRecu2);
-		}
-
-        letter2 = messageRecu2[0]; 
-
-        switch (letterAlreadyUsed(letter2, usedLetter2)){
-        case 0:
-            if (strchr(word, letter2) == NULL && strchr(allLetters,letter2)!=NULL) { // Si le mot de contient pas la lettre choisie
-                current_life2 ++;
-            }
-        }  
-        attempts2 ++;
 
         //---------------------------------
         // Envoie de le message au client 1
 
-        strcpy(messageEnvoi1,prepareToSend(word,usedLetter1,allLetters,letter1,&numberOfUsedLetter1,attempts1,current_life1,maxLife));
+        strcpy(messageEnvoi1,prepareToSend(word,usedLetter1,allLetters,letter1,&numberOfUsedLetter1,attempts1,current_life1,maxLife,&end1));
 
-		// On envoie des données vers le client (cf. protocole)
-		ecrits = write(socketDialogue1, messageEnvoi1, strlen(messageEnvoi1)); 
-		switch(ecrits){
-			case -1 : /* une erreur ! */
-				  perror("write");
-   				  close(socketDialogue1);
-   				  exit(-6);
-			case 0 :  /* la socket est fermée */
-				  fprintf(stderr, "La socket a été fermée par le client !\n\n");
-				  close(socketDialogue1);
-			default:  /* envoi de n octets */
-   				  printf("\nMessage envoyé : %s\n\n", messageEnvoi1);
+		if (end1 == 0 || end2 == 1){
+			// On envoie des données vers le client (cf. protocole)
+			ecrits = write(socketDialogue1, messageEnvoi1, strlen(messageEnvoi1)); 
+			switch(ecrits){
+				case -1 : /* une erreur ! */
+					perror("write");
+					close(socketDialogue1);
+					exit(-6);
+				case 0 :  /* la socket est fermée */
+					fprintf(stderr, "La socket a été fermée par le client !\n\n");
+					close(socketDialogue1);
+				default:  /* envoi de n octets */
+					printf("\nMessage envoyé : %s\n\n", messageEnvoi1);
+			}
+			
+
+			//--------------------------------------------------
+			// Reception et traitement de la réponse du client 1
+			
+			if (end1 == 0)
+			{
+				// On réception les données du client (cf. protocole)
+				lus = read(socketDialogue1, messageRecu1, LG_MESSAGE*sizeof(char)); // ici appel bloquant
+				switch(lus) {
+					case -1 : /* une erreur ! */ 
+						perror("read"); 
+						close(socketDialogue1); 
+						exit(-5);
+					case 0  : /* la socket est fermée */
+						fprintf(stderr, "La socket a été fermée par le client !\n\n");
+						close(socketDialogue1);
+					default:  /* réception de n octets */
+						printf("\nMessage reçu : %s \n\n", messageRecu1);
+				}
+
+				letter1 = messageRecu1[0]; 
+
+				switch (letterAlreadyUsed(letter1, usedLetter1)){
+				case 0:
+					if (strchr(word, letter1) == NULL && strchr(allLetters,letter1)!=NULL) { // Si le mot de contient pas la lettre choisie
+						current_life1 ++;
+					}
+				}  
+			}
+			
+			
+			attempts1 ++;
 		}
 		
-
-        //--------------------------------------------------
-        // Reception et traitement de la réponse du client 1
-		
-		// On réception les données du client (cf. protocole)
-		lus = read(socketDialogue1, messageRecu1, LG_MESSAGE*sizeof(char)); // ici appel bloquant
-		switch(lus) {
-			case -1 : /* une erreur ! */ 
-				  perror("read"); 
-				  close(socketDialogue1); 
-				  exit(-5);
-			case 0  : /* la socket est fermée */
-				  fprintf(stderr, "La socket a été fermée par le client !\n\n");
-   				  close(socketDialogue1);
-			default:  /* réception de n octets */
-				  printf("\nMessage reçu : %s \n\n", messageRecu1);
-		}
-
-        letter1 = messageRecu1[0]; 
-
-        switch (letterAlreadyUsed(letter1, usedLetter1)){
-        case 0:
-            if (strchr(word, letter1) == NULL && strchr(allLetters,letter1)!=NULL) { // Si le mot de contient pas la lettre choisie
-                current_life1 ++;
-            }
-        }  
-        attempts1 ++;
 	}
-
 
 	// On ferme la ressource avant de quitter
    	close(socketEcoute);
