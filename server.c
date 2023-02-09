@@ -201,7 +201,7 @@ int main(int argc, char *argv[]){
 					printf("\nMessage envoyé : %s\n\n", messageEnvoi1);
 					if (end1==1)
 					{
-						end2 = 2;
+						end1 = 2;
 					}
 			}
 		
