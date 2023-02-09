@@ -111,7 +111,7 @@ void display(char *word, char usedLetter[26]){
 /*
 Permet de stocker dans un tableau un message formaté comme avec la fonction display()
 */
-char* prepareToSend(char *word, char usedLetter[26],char allLetters[26], char letter, int *numberOfUsedLetter, int try,int current_life, int maxLife, int* end){
+char* prepareToSend(char *word, char usedLetter[26],char allLetters[26], char letter, int *numberOfUsedLetter, int try,int current_life, int maxLife){
     char *toSend = (char *)malloc(100 * sizeof(char));
     char* message;
     memset(toSend, 0, 100 * sizeof(char));
@@ -157,7 +157,7 @@ char* prepareToSend(char *word, char usedLetter[26],char allLetters[26], char le
 
         sprintf(target, "%s %s", message, word);
 
-        *end+=1;
+        //*end+=1;
 
         return(target);
     } else if (didPlayerWin(current_life, maxLife, word, usedLetter)==-1)
@@ -168,7 +168,7 @@ char* prepareToSend(char *word, char usedLetter[26],char allLetters[26], char le
 
         sprintf(target, "%s %s", message, word);
 
-        *end+=1;
+        //*end+=1;
 
         return(target);
     }
