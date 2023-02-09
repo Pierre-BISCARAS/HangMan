@@ -176,7 +176,6 @@ int main(int argc, char *argv[]){
 					}
 				}  
 			}
-			
 			attempts2 ++;
 		}
 
@@ -235,10 +234,15 @@ int main(int argc, char *argv[]){
 					}
 				}  
 			}
-			
-			
 			attempts1 ++;
 		}
+
+		if (end1 == 2 && end2 == 2)
+		{
+			fprintf(stderr, "Les deux parties sont terminées.\nFermeture du serveur.\n");
+			exit(-9);
+		}
+		
 		
 	}
 
