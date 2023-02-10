@@ -23,7 +23,7 @@ int main(int argc, char *argv[]){
 	int  port_dest;
 
 	// Variables jeu
-	char *word; // Mot a deviné
+	char *word= malloc(sizeof(char) * 256); // Mot a deviné
 	char allLetters[26] = "abcdefghijklmnopqrstuvwxyz"; // Tableau qui contient toutes les lettres de l'alphabet (lettre jouable)
 	char usedLetter[26] = {}; // Tableau qui contient les lettres que le joueur propose
 	int numberOfUsedLetter = 0;
@@ -88,14 +88,17 @@ int main(int argc, char *argv[]){
 			messageRecu[nb]='\0';
 			printf("%s\n", messageRecu);
 	}
+
 	
 	int isFirst = strcmp(messageRecu,"A vous de choisir le mot\n") == 0 ? 1 : 0;
 
 	if (isFirst == 1)
 	{
 		printf("Entrez votre mot : ");
+
 		scanf("%s", word);
 	}
+
 	
 	
 
