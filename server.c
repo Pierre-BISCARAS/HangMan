@@ -28,6 +28,10 @@ int main(int argc, char *argv[]){
 	char messageEnvoi2[LG_MESSAGE];
 	int ecrits, lus; /* nb d’octets ecrits et lus */
 	int retour;
+
+	int joueur = 0;
+
+	pid_t forkS;
     
     // --------------------------------------------------
     // Création / init du socket
@@ -65,156 +69,174 @@ int main(int argc, char *argv[]){
     //---------------------------------------------------------------------
     // Attente d'une conexion
 	
-    memset(messageRecu1, 0x00, LG_MESSAGE*sizeof(char));
-	memset(messageRecu2, 0x00, LG_MESSAGE*sizeof(char));
-    printf("\nAttente d’une demande de connexion (quitter avec Ctrl-C)\n\n");
+	while (1)
+	{
+		if (joueur == 0)
+		{
+			memset(messageRecu1, 0x00, LG_MESSAGE*sizeof(char));
+			memset(messageRecu2, 0x00, LG_MESSAGE*sizeof(char));
+			printf("\nAttente d’une demande de connexion (quitter avec Ctrl-C)\n\n");
 
-    // c’est un appel bloquant
-    socketDialogue1 = accept(socketEcoute, (struct sockaddr *)&pointDeRencontreDistant, &longueurAdresse);
-    if (socketDialogue1 < 0) {
-        perror("accept");
-        close(socketDialogue1);
-        close(socketEcoute);
-        exit(-4);
-    }
+			// c’est un appel bloquant
+			socketDialogue1 = accept(socketEcoute, (struct sockaddr *)&pointDeRencontreDistant, &longueurAdresse);
+			if (socketDialogue1 < 0) {
+				perror("accept");
+				close(socketDialogue1);
+				close(socketEcoute);
+				exit(-4);
+			}
 
-	printf("Le client 1 vient de se connecter\n\n");
-	printf("Attente d'un deuxième client\n\n");
+			printf("Le client 1 vient de se connecter\n\n");
+			printf("Attente d'un deuxième client\n\n");
 
-	socketDialogue2 = accept(socketEcoute, (struct sockaddr *)&pointDeRencontreDistant, &longueurAdresse);
-    if (socketDialogue2 < 0) {
-        perror("accept");
-        close(socketDialogue2);
-        close(socketEcoute);
-        exit(-4);
-    }
+			socketDialogue2 = accept(socketEcoute, (struct sockaddr *)&pointDeRencontreDistant, &longueurAdresse);
+			if (socketDialogue2 < 0) {
+				perror("accept");
+				close(socketDialogue2);
+				close(socketEcoute);
+				exit(-4);
+			}
 
-    printf("Le client 2 vient de se connecter\n\n");
-    printf("Le jeu peut commencer\n\n");
+			printf("Le client 2 vient de se connecter\n\n");
+			printf("Le jeu peut commencer\n\n");
 
-	strcpy(messageEnvoi1,"A vous de choisir le mot\n");
+			strcpy(messageEnvoi1,"A vous de choisir le mot\n");
 
-	// On envoie des données vers le client (cf. protocole)
-	ecrits = write(socketDialogue1, messageEnvoi1, strlen(messageEnvoi1)); 
-	switch(ecrits){
-		case -1 : /* une erreur ! */
-			perror("write");
-			close(socketDialogue1);
-		case 0 :  /* la socket est fermée */
-			fprintf(stderr, "La socket a été fermée par le client !\n\n");
-			close(socketDialogue1);
-		default:  /* envoi de n octets */
-			printf("\nMessage envoyé : %s\n\n", messageEnvoi1);
+			// On envoie des données vers le client (cf. protocole)
+			ecrits = write(socketDialogue1, messageEnvoi1, strlen(messageEnvoi1)); 
+			switch(ecrits){
+				case -1 : /* une erreur ! */
+					perror("write");
+					close(socketDialogue1);
+				case 0 :  /* la socket est fermée */
+					fprintf(stderr, "La socket a été fermée par le client !\n\n");
+					close(socketDialogue1);
+				default:  /* envoi de n octets */
+					printf("\nMessage envoyé : %s\n\n", messageEnvoi1);
+			}
+
+			strcpy(messageEnvoi2,"Attendez que l'autre joueur choissise un mot\n");
+
+			// On envoie des données vers le client (cf. protocole)
+			ecrits = write(socketDialogue2, messageEnvoi2, strlen(messageEnvoi2)); 
+			switch(ecrits){
+				case -1 : /* une erreur ! */
+					perror("write");
+					close(socketDialogue2);
+				case 0 :  /* la socket est fermée */
+					fprintf(stderr, "La socket a été fermée par le client !\n\n");
+					close(socketDialogue2);
+				default:  /* envoi de n octets */
+					printf("\nMessage envoyé : %s\n\n", messageEnvoi2);
+			}
+
+			joueur = 2;
+		} else {
+			forkS = fork();
+			if (forkS == 0)
+			{
+				while(1){
+
+					//---------------------------------
+					// Envoie de le message au client 1
+
+					//--------------------------------------------------
+					// Reception et traitement de la réponse du client 1
+
+					memset(messageRecu1, 0x00, LG_MESSAGE*sizeof(char));
+					// On réception les données du client (cf. protocole)
+					lus = read(socketDialogue1, messageRecu1, LG_MESSAGE*sizeof(char)); // ici appel bloquant
+					switch(lus) {
+						case -1 : /* une erreur ! */ 
+							perror("read"); 
+							close(socketDialogue1); 
+							exit(-5);
+						case 0  : /* la socket est fermée */
+							fprintf(stderr, "La socket a été fermée par le client !\n\n");
+							close(socketDialogue1);
+							exit(-8);
+						default:  /* réception de n octets */
+							printf("\nMessage reçu : %s \n\n", messageRecu1);
+					}
+
+					strcpy(messageEnvoi2,messageRecu1);
+
+					
+
+					//---------------------------------
+					// Envoie de le message au client 2
+
+					// On envoie des données vers le client (cf. protocole)
+					ecrits = write(socketDialogue2, messageEnvoi2, strlen(messageEnvoi2)); 
+					switch(ecrits){
+						case -1 : /* une erreur ! */
+							perror("write");
+							close(socketDialogue2);
+						case 0 :  /* la socket est fermée */
+							fprintf(stderr, "La socket a été fermée par le client !\n\n");
+							close(socketDialogue2);
+						default:  /* envoi de n octets */
+							printf("\nMessage envoyé : %s\n\n", messageEnvoi2);
+					}
+
+					//--------------------------------------------------
+					// Reception et traitement de la réponse du client 2
+
+					if (strstr(messageEnvoi2,"\nVous avez gagné !") || strstr(messageEnvoi2,"\nDommage vous avez perdu :("))
+					{
+						printf("Fin de la partie.");
+						close(socketDialogue1); 
+						close(socketDialogue2); 
+						exit(-9);
+					} 
+					
+					memset(messageRecu2, 0x00, LG_MESSAGE*sizeof(char));
+					// On réception les données du client (cf. protocole)
+					lus = read(socketDialogue2, messageRecu2, LG_MESSAGE*sizeof(char)); // ici appel bloquant
+					switch(lus) {
+						case -1 : /* une erreur ! */ 
+							perror("read"); 
+							close(socketDialogue2); 
+							exit(-5);
+						case 0  : /* la socket est fermée */
+							fprintf(stderr, "La socket a été fermée par le client !\n\n");
+							close(socketDialogue2);
+						default:  /* réception de n octets */
+							printf("\nMessage reçu : %s \n\n", messageRecu2);
+					}
+
+					strcpy(messageEnvoi1,&messageRecu2[0]);
+
+					// On envoie des données vers le client (cf. protocole)
+					ecrits = write(socketDialogue1, messageEnvoi1, strlen(messageEnvoi1)); 
+					switch(ecrits){
+						case -1 : /* une erreur ! */
+							perror("write");
+							close(socketDialogue1);
+							exit(-6);
+						case 0 :  /* la socket est fermée */
+							fprintf(stderr, "La socket a été fermée par le client !\n\n");
+							close(socketDialogue1);
+							exit(-7);
+						default:  /* envoi de n octets */
+							printf("\nMessage envoyé : %s\n\n", messageEnvoi1);
+					}
+
+				}
+
+				// On ferme la ressource avant de quitter
+				close(socketEcoute);
+				return 0; 
+			}
+			else
+			{
+				joueur = 0;
+			}
+		}
 	}
-
-	strcpy(messageEnvoi2,"Attendez que l'autre joueur choissise un mot\n");
-
-	// On envoie des données vers le client (cf. protocole)
-	ecrits = write(socketDialogue2, messageEnvoi2, strlen(messageEnvoi2)); 
-	switch(ecrits){
-		case -1 : /* une erreur ! */
-			perror("write");
-			close(socketDialogue2);
-		case 0 :  /* la socket est fermée */
-			fprintf(stderr, "La socket a été fermée par le client !\n\n");
-			close(socketDialogue2);
-		default:  /* envoi de n octets */
-			printf("\nMessage envoyé : %s\n\n", messageEnvoi2);
-	}
-
+	
     //---------------------------------------------------------------------
     // Boucle du jeu
 
-	while(1){
-
-		//---------------------------------
-        // Envoie de le message au client 1
-
-		//--------------------------------------------------
-		// Reception et traitement de la réponse du client 1
-
-		memset(messageRecu1, 0x00, LG_MESSAGE*sizeof(char));
-		// On réception les données du client (cf. protocole)
-		lus = read(socketDialogue1, messageRecu1, LG_MESSAGE*sizeof(char)); // ici appel bloquant
-		switch(lus) {
-			case -1 : /* une erreur ! */ 
-				perror("read"); 
-				close(socketDialogue1); 
-				exit(-5);
-			case 0  : /* la socket est fermée */
-				fprintf(stderr, "La socket a été fermée par le client !\n\n");
-				close(socketDialogue1);
-				exit(-8);
-			default:  /* réception de n octets */
-				printf("\nMessage reçu : %s \n\n", messageRecu1);
-		}
-
-		strcpy(messageEnvoi2,messageRecu1);
-
-		
-
-		//---------------------------------
-        // Envoie de le message au client 2
-
-		// On envoie des données vers le client (cf. protocole)
-		ecrits = write(socketDialogue2, messageEnvoi2, strlen(messageEnvoi2)); 
-		switch(ecrits){
-			case -1 : /* une erreur ! */
-				perror("write");
-				close(socketDialogue2);
-			case 0 :  /* la socket est fermée */
-				fprintf(stderr, "La socket a été fermée par le client !\n\n");
-				close(socketDialogue2);
-			default:  /* envoi de n octets */
-				printf("\nMessage envoyé : %s\n\n", messageEnvoi2);
-		}
-
-		//--------------------------------------------------
-		// Reception et traitement de la réponse du client 2
-
-		if (strstr(messageEnvoi2,"\nVous avez gagné !") || strstr(messageEnvoi2,"\nDommage vous avez perdu :("))
-		{
-			printf("Fin de la partie.");
-			close(socketDialogue1); 
-			close(socketDialogue2); 
-			exit(-9);
-		} 
-		
-		memset(messageRecu2, 0x00, LG_MESSAGE*sizeof(char));
-		// On réception les données du client (cf. protocole)
-		lus = read(socketDialogue2, messageRecu2, LG_MESSAGE*sizeof(char)); // ici appel bloquant
-		switch(lus) {
-			case -1 : /* une erreur ! */ 
-				perror("read"); 
-				close(socketDialogue2); 
-				exit(-5);
-			case 0  : /* la socket est fermée */
-				fprintf(stderr, "La socket a été fermée par le client !\n\n");
-				close(socketDialogue2);
-			default:  /* réception de n octets */
-				printf("\nMessage reçu : %s \n\n", messageRecu2);
-		}
-
-		strcpy(messageEnvoi1,&messageRecu2[0]);
-
-		// On envoie des données vers le client (cf. protocole)
-		ecrits = write(socketDialogue1, messageEnvoi1, strlen(messageEnvoi1)); 
-		switch(ecrits){
-			case -1 : /* une erreur ! */
-				perror("write");
-				close(socketDialogue1);
-				exit(-6);
-			case 0 :  /* la socket est fermée */
-				fprintf(stderr, "La socket a été fermée par le client !\n\n");
-				close(socketDialogue1);
-				exit(-7);
-			default:  /* envoi de n octets */
-				printf("\nMessage envoyé : %s\n\n", messageEnvoi1);
-		}
-
-	}
-
-	// On ferme la ressource avant de quitter
-   	close(socketEcoute);
-	return 0; 
+	
 }
