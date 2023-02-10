@@ -1,6 +1,6 @@
 # HangMan Game
 
-This project is a hangman game coded in C language. First, we launch the server with a chosen word, then two clients connect to the server and a game can begin for each player!
+This project is a hangman game coded in C language. First, we start the server, then a client connects to the server and chooses a word to make another client connected to the server guess the word. The game can be started
 
 ## Requirements
 
@@ -36,9 +36,8 @@ To play the game, you had to run it.
 
 ### Run the server
 
-The server expects the desired word for the game as an argument
+The server is waiting for two players to connect
 
-*Replace "hangman" with the word you want people to guess.*
 
 **Warning: do not use capital letters or special characters** 
 
@@ -51,13 +50,13 @@ You have to start by compiling the file
 And start the server
 
 ```bash
-> ./server hangman
+> ./server
 ```
 #### Windows :
 
 In reference to [this tutorial](https://www.wikihow.com/Run-C-Program-in-Command-Prompt), compile and run it.
 ```bash
-> server.exe hangman
+> server.exe
 ```
 
 #### You have the server, now we need our player, the client.
@@ -66,7 +65,6 @@ In reference to [this tutorial](https://www.wikihow.com/Run-C-Program-in-Command
 
 The client needs the server ip and port as arguments.
 
-*Replace "127.0.0.1" with the previously created server ip.*
 
 **Port 5051 is mandatory.**
 
